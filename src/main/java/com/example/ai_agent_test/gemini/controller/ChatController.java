@@ -2,16 +2,17 @@ package com.example.ai_agent_test.gemini.controller;
 
 
 
+import java.io.IOException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.google.common.net.HttpHeaders;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class ChatController {
@@ -35,22 +36,21 @@ public class ChatController {
 						.content();
 	}
 	
-//	@PostMapping(value = "/chat/image-binary", consumes = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
-//	public String chatWithBinaryImage(
-//			@RequestBody byte[] imageBytes,
-//			@RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType,
-//			@RequestParam String promptText 
-//			) {
-//		
-//		//바이너리 데이터를 Spring resource 로 변환
-//		ByteArrayResource imageResouce = new ByteArrayResource(imageBytes);
-//		
-//		//Content-Type 헤더를 기반으로 MediaType을 파싱
-//		MediaType mediaType = MediaType.parseMediaType(contentType);
-//		
-//		//Media 객체 생성
-//		Media media = new MediaType(mediaType, imageResouce)''
-//		
-//	}
+	/**
+	 * 이미지 질문
+	 * @param imageFile 이미지
+	 * @param query 질문 텍스트
+	 * @return
+	 * @throws IOException
+	 */
+	@PostMapping(value = "/chat/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public String chatWithBinaryImage(@RequestParam("image") MultipartFile imageFile, 
+            @RequestParam("query") String query) throws IOException {
+		// 바이너리 이미지 데이터를 Media 객체로 변환
+		byte[] data = imageFile.getBytes();
+		Resource imageResource = new ByteArrayResource(data);
+        return chatClient.prompt().user(u -> u.text(query)
+        							.media(MimeTypeUtils.IMAGE_PNG, imageResource)).call().content();
+	}
 
 }
