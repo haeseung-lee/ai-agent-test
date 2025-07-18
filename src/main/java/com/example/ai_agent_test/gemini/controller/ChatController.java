@@ -5,7 +5,6 @@ package com.example.ai_agent_test.gemini.controller;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,8 +27,8 @@ public class ChatController {
 	 * @param message 질문 텍스트
 	 * @return Gemini 모델 응답 텍스트
 	 */
-	@GetMapping("/chat/text")
-	public String chat(@RequestParam String message) {
+	@PostMapping("/chat/text")
+	public String chat(@RequestBody String message) {
 		return chatClient.prompt()
 						.user(message)
 						.call()
